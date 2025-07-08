@@ -1,7 +1,9 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import path from "path";
 
 export default function Home() {
+  console.log('process.pwd()',path.join(process.cwd(),'db.sqlite'))
   return (
     <div className={styles.page}>
       <main className={styles.main}>
