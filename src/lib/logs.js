@@ -29,7 +29,6 @@ export async function getLogs() {
     const logs = await db.all(
       "SELECT * FROM audit_logs ORDER BY timestamps DESC"
     );
-    console.log("l-----------ogs", logs);
     const logData = logs.map((log) => ({
       ...log,
       details: log.details ? JSON.parse(log.details) : null,

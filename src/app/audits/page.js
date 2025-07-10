@@ -4,7 +4,6 @@ import { Box, Container, Typography } from "@mui/material";
 import { getLogs } from "@/lib/logs";
 export default async function DashboardPage() {
   const logRecords = await getLogs();
-  console.log("getLoggs", logRecords);
 
   return (
     <>

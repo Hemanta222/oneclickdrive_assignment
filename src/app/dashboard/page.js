@@ -6,7 +6,6 @@ import { getLogs } from "@/lib/logs";
 export default async function DashboardPage() {
   const initialProducts = await getProducts();
   const getLogss = await getLogs();
-  console.log("getLoggs", getLogss);
 
   return (
     <>
