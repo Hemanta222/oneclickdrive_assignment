@@ -1,6 +1,7 @@
-# oneclickdrive_assignment
-# live url - https://oneclickdrive-assignment-lime.vercel.app/
-# *Note* - In the project i have used sqlite DB for managing products. Since i have deploed on vercel which is serverless therefore sqlite become read only therefore the edit / update functionlites is not working on the live server.
+# oneclickdrive assignment
+
+## live url - https://oneclickdrive-assignment-lime.vercel.app/
+## *Note* - In the project, I have used an SQLite DB for managing products. Since I have deployed it on Vercel, which is serverless, SQLite becomes read-only; therefore, the edit/update functionalities are not working on the live server..
 
 ## sample users
 email - test1@test.com
@@ -80,7 +81,7 @@ This project is a comprehensive Dashboard Management System designed to facilita
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/Hemanta222/oneclickdrive_assignment.git
     cd product-management-system
     ```
 
