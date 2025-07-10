@@ -3,6 +3,9 @@
 ## live url - https://oneclickdrive-assignment-lime.vercel.app/
 ## *Note* - In the project, I have used an SQLite DB for managing products. Since I have deployed it on Vercel, which is serverless, SQLite becomes read-only; therefore, the edit/update functionalities are not working on the live server..
 
+### Recording Video Link - https://drive.google.com/drive/folders/1E4YRBTumau5kW5YuzLfKsM9O4xQBC0pa?usp=drive_link
+### Screenshots link -  https://drive.google.com/drive/folders/1LnQOQa16dKG5kKtEeP0g2TTSoiTugNqk?usp=drive_link
+
 ## sample users
 email - test1@test.com
 password - password
