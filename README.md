@@ -82,7 +82,7 @@ This project is a comprehensive Dashboard Management System designed to facilita
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/Hemanta222/oneclickdrive_assignment.git
-    cd product-management-system
+    cd oneclickdrive_assignment
     ```
 
 3.  **Setup:**
@@ -98,6 +98,6 @@ This project is a comprehensive Dashboard Management System designed to facilita
 1.  **Access the application:** Once both backend and frontend servers are running, open your web browser and navigate to `http://localhost:3000` (or the port where your Next.js app is running).
 2.  **Signup/Login:** Create a new account or log in with existing credentials.
 3.  **Dashboard:** Explore the dashboard to view, add, edit, and update the status of products.
-4.  **Audit Logs:** (If applicable) Navigate to the audit logs page to review system activities.
+4.  **Audit Logs:** Navigate to the audit logs page to review system activities.
 
 
