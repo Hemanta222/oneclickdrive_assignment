@@ -1,12 +1,10 @@
 import React from "react";
-import ProductList from "./ProductList";
+import LogList from "./LogList";
 import { Box, Container, Typography } from "@mui/material";
-import { getProducts } from "@/lib/actions";
 import { getLogs } from "@/lib/logs";
 export default async function DashboardPage() {
-  const initialProducts = await getProducts();
-  const getLogss = await getLogs();
-  console.log("getLoggs", getLogss);
+  const logRecords = await getLogs();
+  console.log("getLoggs", logRecords);
 
   return (
     <>
@@ -17,13 +15,13 @@ export default async function DashboardPage() {
           sx={{ display: "flex", alignItems: "center", gap: 1 }}
         >
           <Typography variant="h5" component="h1">
-            Dashboard
+            Audit Logs
           </Typography>
           <Typography variant="body1" component="p" color="grey">
-            / Product List
+            / Logs
           </Typography>
         </Box>
-        <ProductList initialProducts={initialProducts} />
+        <LogList logRecords={logRecords.logs} />
         <br />
       </Container>
     </>

@@ -11,33 +11,33 @@ import Image from "next/image";
 import { useContextData } from "@/context/Context";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import { useRouter } from "next/navigation";
-
+import { logout } from "@/lib/actions";
 function ResponsiveAppBar() {
-  const { userData, displayMessage, setUserData } = useContextData();
-
   const [isClient, setIsClient] = React.useState(false);
+  const { displayMessage, userData, setUserData } = useContextData();
+  const router = useRouter();
 
   React.useEffect(() => {
     setIsClient(true);
   }, []);
 
   const handleLogout = async () => {
-    const res = await fetch("/api/auth/logout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
-    const json = await res.json();
-    if (res.ok) {
-      router.push("/login");
-      displayMessage(json.message, "success");
-      setUserData({ usedId: 0, email: "" });
-    } else {
-      displayMessage(json.message, "error");
+    try {
+      const response = await logout();
+      if (response.success) {
+        displayMessage(response.message, "success");
+        setUserData({
+          userId: 0,
+          email: "",
+        });
+        router.push("/login");
+      } else {
+        displayMessage(response.message, "error");
+      }
+    } catch (error) {
+      displayMessage(error.message, "error");
     }
   };
-  const router = useRouter();
-
-  console.log("ResponsiveAppBar userData", userData);
 
   return isClient ? (
     <AppBar position="static" color="transparent" elevation={0}>
@@ -48,12 +48,14 @@ function ResponsiveAppBar() {
             priority={true}
             width={200}
             height={60}
-            alt="logo"
+            alt="logo" 
+            onClick={()=>router.push("/")}
+            id='logo'
           />
           <Box flex={1}></Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            {userData.userId ? (
+            {userData?.userId ? (
               <Box
                 sx={{
                   display: "flex",
@@ -62,7 +64,11 @@ function ResponsiveAppBar() {
                   gap: 1,
                 }}
               >
-                <Typography variant="body1" color="grey" sx={{display:{xs:'none',sm:"block"}}}>
+                <Typography
+                  variant="body1"
+                  color="grey"
+                  sx={{ display: { xs: "none", sm: "block" } }}
+                >
                   {userData?.email}
                 </Typography>
 

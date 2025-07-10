@@ -5,36 +5,34 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import CustomTextField from "../components/CustomTextField";
 import Link from "next/link";
+import { getUserDetails, register } from "@/lib/actions";
 
 const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const router = useRouter();
-  const { displayMessage } = useContextData();
+  const { displayMessage ,setUserData} = useContextData();
 
-  const signupHandler = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch("api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email, password: password }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-
-        router.push("/dashboard");
-        displayMessage(data?.message || "Success", "success");
-      } else {
-        const json = await res.json();
-        displayMessage(json.message, "error");
+    const signupHandler = async (e) => {
+      e.preventDefault();
+      try {
+        const response = await register(email, password);
+        if (response.success) {
+  
+          const data = await getUserDetails();
+          setUserData({ userId: data?.user?.userId, email: data?.user?.email });
+  
+          router.push("/dashboard");
+          displayMessage(response?.message || "Success", "success");
+        } else {
+          displayMessage(response.message, "error");
+        }
+      } catch (error) {
+        displayMessage(error.message, "error");
       }
-    } catch (error) {
-      displayMessage(error.message, "error");
-    }
-  };
+    };
+
 
   return (
     <Box

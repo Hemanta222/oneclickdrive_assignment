@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
+const JWT_SECRET = process.env.JWT_SECRET;
 
-const protectedRoutes = ["/dashboard"];
+const protectedRoutes = ["/dashboard","/audits"];
 const publicRoutes = ["/login", "/signup"];
 
 export default async function middleware(req) {
@@ -12,25 +14,35 @@ export default async function middleware(req) {
 
   const token = (await cookies()).get("authToken")?.value;
 
-  console.log("-------middleware token", token);
+  let decoded = null;
+  if (token) {
+    try {
+      const JWT_SECRET_UINT8_ARRAY = new TextEncoder().encode(JWT_SECRET);
+      decoded = await jwtVerify(token, JWT_SECRET_UINT8_ARRAY);
+    } catch (error) {
+      const cookieStore = await cookies();
+      cookieStore.delete("authToken");
+      console.log("==========error", error);
+    }
+  }
 
-  if (isProtectedRoute && !token) {
+  if (isProtectedRoute && !decoded) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
 
   // Redirect to /dashboard if the user is authenticated
   if (
     isPublicRoute &&
-    token &&
+    decoded &&
     !req.nextUrl.pathname.startsWith("/dashboard")
   ) {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 
-  if (token && req.nextUrl.pathname === "/") {
+  if (decoded && req.nextUrl.pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
-  if (!token && req.nextUrl.pathname === "/") {
+  if (!decoded && req.nextUrl.pathname === "/") {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
 

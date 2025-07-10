@@ -5,37 +5,34 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import CustomTextField from "../components/CustomTextField";
 import Link from "next/link";
+import { getUserDetails, login } from "@/lib/actions";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const router = useRouter();
-  const { displayMessage } = useContextData();
+  const { displayMessage, setUserData } = useContextData();
 
   const loginHandler = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email, password: password }),
-      });
+      const response = await login(email, password);
+      if (response.success) {
 
-      if (res.ok) {
-        const data = await res.json();
+        const data = await getUserDetails();
+        setUserData({ userId: data?.user?.userId, email: data?.user?.email });
 
         router.push("/dashboard");
-        displayMessage(data?.message || "Success", "success");
+        displayMessage(response?.message || "Success", "success");
       } else {
-        const json = await res.json();
-        displayMessage(json.message, "error");
+        displayMessage(response.message, "error");
       }
     } catch (error) {
       displayMessage(error.message, "error");
     }
   };
-
+ 
   return (
     <Box
       sx={{

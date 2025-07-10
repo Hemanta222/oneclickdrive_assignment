@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import {
   DataGrid,
@@ -6,107 +7,46 @@ import {
   GridRowEditStopReasons,
 } from "@mui/x-data-grid";
 
-
 import EditIcon from "@mui/icons-material/Edit";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import DangerousIcon from "@mui/icons-material/Dangerous";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Paper,
-} from "@mui/material";
+
+import { Box, Paper } from "@mui/material";
 import Filter from "./Filter";
+
 import { useContextData } from "@/context/Context";
+import { editProduct, updateProductStatus } from "@/lib/actions";
 
-function RejectActionItem({ rejectItem, ...props }) {
-  const [open, setOpen] = React.useState(false);
+import RejectConfirmModal from "./RejectConfirmModal";
 
-  return (
-    <React.Fragment>
-      <GridActionsCellItem {...props} onClick={() => setOpen(true)} />
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Reject this item?</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Do you want to set the status as `<b>Reject</b>` ?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>No</Button>
-          <Button
-            onClick={() => {
-              setOpen(false);
-              rejectItem();
-            }}
-            // color="error"
-            autoFocus
-          >
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
-  );
-}
-
-const ProductList = () => {
+const ProductList = ({ initialProducts }) => {
   const { displayMessage } = useContextData();
-  const [products, setProducts] = React.useState([]);
-  const [rows, setRows] = React.useState(products);
+  const [rows, setRows] = React.useState(initialProducts);
   const [loading, setLoading] = useState(true);
   const [rowModesModel, setRowModesModel] = React.useState({});
 
-  React.useEffect(() => {
-    async function getProducts() {
-      try {
-        const res = await fetch("/api/product/get-products");
-        if (res.ok) {
-          const data = await res.json();
-
-          if (Array.isArray(data.products) && data.products.length > 0) {
-            setProducts(data.products);
-          } else {
-            setProducts([]);
-          }
-        } else {
-          displayMessage(res.statusText, "error");
-        }
-      } catch (error) {
-        displayMessage(error.message || error, "error");
-      } finally {
-        setLoading(false);
-      }
-    }
-    getProducts();
-  }, []);
-
-  React.useEffect(() => {
-    setRows(products);
-  }, [products]);
-
+  const [showModal, setShowModal] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(0);
   const [filter, setFilter] = useState("all");
+
+  React.useEffect(() => {
+    let filteredList = [];
+    if (filter === "all") {
+      filteredList = initialProducts;
+    } else {
+      filteredList = initialProducts.filter((item) => item.status === filter);
+    }
+
+    setRows(filteredList);
+    setLoading(false);
+  }, [initialProducts, filter]);
 
   const handleStatusFilter = (e) => {
     const value = e.target.value;
     setFilter(value);
-    if (value === "all") {
-      setRows(products);
-    } else {
-      const filteredList = products.filter((item) => item.status === value);
-      setRows(filteredList);
-    }
+
   };
 
   const handleRowEditStop = (params, event) => {
@@ -137,83 +77,77 @@ const ProductList = () => {
 
   const processRowUpdate = async (newRow) => {
     const updatedRow = { ...newRow, isNew: false };
-
     try {
-      const res = await fetch("/api/product/edit-product", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newRow }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        displayMessage(json.message, "success");
-        setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+      const response = await editProduct(updatedRow);
+      if (response.success) {
+        displayMessage(response.message, "success");
         return updatedRow;
       } else {
-        displayMessage(res.statusText, "error");
+        displayMessage(response.message, "error");
       }
     } catch (error) {
-      displayMessage(error.message || error, "error");
+      displayMessage(error.message, "error");
     }
   };
 
   const handleRowModesModelChange = (newRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
-
-  const handleRejectItem = React.useCallback(
-    (id) => async () => {
-      try {
-        const res = await fetch("/api/product/update-product-status", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: id, status: "reject" }),
-        });
-        if (res.ok) {
-          const json = await res.json();
-          setRows((prevRows) =>
-            prevRows.map((row) => {
-              if (row.id === id) {
-                return { ...row, status: "reject" };
-              } else return row;
-            })
-          );
-          displayMessage(json.message, "success");
-        } else {
-          displayMessage(res.statusText, "error");
-        }
-      } catch (error) {
-        displayMessage(error.message || error, "error");
-      }
-    },
-    []
-  );
-
-  const approveHandler = (id) => async () => {
+  const modalOpenHandler = (id) => {
+    setSelectedProductId(id);
+    setShowModal(true);
+  };
+  const modalCloseHandler = () => {
+    setSelectedProductId(0);
+    setShowModal(false);
+  };
+  const handleRejectItem = async () => {
     try {
-      const res = await fetch("/api/product/update-product-status", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id, status: "approve" }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        setRows((prevRows) =>
-          prevRows.map((row) => {
-            if (row.id === id) {
-              return { ...row, status: "approve" };
-            } else return row;
-          })
-        );
-        displayMessage(json.message, "success");
+      const response = await updateProductStatus(selectedProductId, "reject");
+      if (response.success) {
+        displayMessage(response.message, "success");
       } else {
-        displayMessage(res.statusText, "error");
+        displayMessage(response.message, "error");
       }
     } catch (error) {
-      displayMessage(error.message || error, "error");
+      displayMessage(error.message, "error");
     }
   };
 
+  const approveHandler = (id) => async () => {
+    try {
+      const response = await updateProductStatus(id, "approve");
+      if (response.success) {
+        displayMessage(response.message, "success");
+      } else {
+        displayMessage(response.message, "error");
+      }
+    } catch (error) {
+      displayMessage(error.message, "error");
+    }
+    // try {
+    //   const res = await fetch("/api/product/update-product-status", {
+    //     method: "PATCH",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ id: id, status: "approve" }),
+    //   });
+    //   if (res.ok) {
+    //     const json = await res.json();
+    //     setRows((prevRows) =>
+    //       prevRows.map((row) => {
+    //         if (row.id === id) {
+    //           return { ...row, status: "approve" };
+    //         } else return row;
+    //       })
+    //     );
+    //     displayMessage(json.message, "success");
+    //   } else {
+    //     displayMessage(res.statusText, "error");
+    //   }
+    // } catch (error) {
+    //   displayMessage(error.message || error, "error");
+    // }
+  };
   const columns = [
     { field: "id", headerName: "Id" },
     { field: "brand", headerName: "Brand", flex: 1, editable: true },
@@ -286,14 +220,12 @@ const ProductList = () => {
             onClick={approveHandler(id)}
             showInMenu
           />,
-
-          <RejectActionItem
+          <GridActionsCellItem
             key="reject"
-            label="Reject"
-            showInMenu
             icon={<DangerousIcon color="error" />}
-            rejectItem={handleRejectItem(id)}
-            closeMenuOnClick={false}
+            label="Reject"
+            onClick={() => modalOpenHandler(id)}
+            showInMenu
           />,
         ];
       },
@@ -310,11 +242,18 @@ const ProductList = () => {
         boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.1)",
         display: "flex",
         flexDirection: "column",
-          justifyContent:'space-between',
+        justifyContent: "space-between",
         alignItems: "flex-end",
         gap: 3,
       }}
     >
+      {showModal && (
+        <RejectConfirmModal
+          open={showModal}
+          closeModal={modalCloseHandler}
+          rejectItem={handleRejectItem}
+        />
+      )}
       <Filter filter={filter} handleChange={handleStatusFilter} />
       <Box sx={{ width: "100%" }}>
         <DataGrid

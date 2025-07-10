@@ -34,7 +34,9 @@ a {
   color: inherit;
   text-decoration: none;
 }
-
+#logo{
+  cursor: pointer;
+}
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
