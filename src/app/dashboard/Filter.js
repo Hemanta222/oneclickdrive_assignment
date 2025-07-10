@@ -1,16 +1,15 @@
-
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import { Container } from "@mui/material";
 
 export default function Filter(props) {
- const {filter,handleChange} = props
+  const { filter, handleChange } = props;
   return (
-    <Box sx={{ minWidth: 120,maxWidth:{xs:'100%',sm:200} }}>
-        
+    <Box sx={{ width: "100%", maxWidth: { xs: "100%", sm: "180px" } }}>
       <FormControl fullWidth>
         <InputLabel id="filter">Filter By Status</InputLabel>
         <Select
@@ -20,10 +19,10 @@ export default function Filter(props) {
           label="Filter By Status"
           onChange={handleChange}
         >
-          <MenuItem value={'all'}>All</MenuItem>
-          <MenuItem value={'pending'}>Pending</MenuItem>
-          <MenuItem value={'approve'}>Approve</MenuItem>
-          <MenuItem value={'reject'}>Reject</MenuItem>
+          <MenuItem value={"all"}>All</MenuItem>
+          <MenuItem value={"pending"}>Pending</MenuItem>
+          <MenuItem value={"approve"}>Approve</MenuItem>
+          <MenuItem value={"reject"}>Reject</MenuItem>
         </Select>
       </FormControl>
     </Box>

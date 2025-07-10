@@ -2,13 +2,15 @@
 
 import React, { createContext, useContext, useState } from 'react'
 
-export const FeedbackContext = createContext()
+export const Context = createContext()
 
 
-export const FeedbackProvider = ({ children }) => {
+export const Provider = ({ children }) => {
     const [message, setMessage] = useState('');
     const [open, setOpen] = useState(false)
     const [severity, setSeverity] = useState('info')
+
+    const [userData, setUserData] = useState({userId:0,email:""});
 
     const displayMessage = (message, severity) => {
         setMessage(message)
@@ -19,11 +21,14 @@ export const FeedbackProvider = ({ children }) => {
         setMessage('')
         setOpen(false)
     }
-    const values = { message, severity, open, displayMessage, closeMessage }
-    return <FeedbackContext.Provider value={values}>{children}</FeedbackContext.Provider>
+    const values = { message, severity, open, displayMessage, closeMessage ,userData,setUserData}
+    return <Context.Provider value={values}>{children}</Context.Provider>
 }
 
-export function useFeedback() {
-    const context = useContext(FeedbackContext)
+export function useContextData() {
+    const context = useContext(Context)
+    if(context===undefined){
+        throw new Error('context error')
+    }
     return context;
 }

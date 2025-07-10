@@ -6,17 +6,17 @@ import React, { useState } from "react";
 import CustomTextField from "../components/CustomTextField";
 import Link from "next/link";
 
-const LoginPage = () => {
+const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const router = useRouter();
   const { displayMessage } = useContextData();
 
-  const loginHandler = async (e) => {
+  const signupHandler = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("api/auth/login", {
+      const res = await fetch("api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email, password: password }),
@@ -47,7 +47,7 @@ const LoginPage = () => {
         p: 2,
       }}
       component="form"
-      onSubmit={loginHandler}
+      onSubmit={signupHandler}
     >
       <Paper
         elevation={8}
@@ -69,7 +69,7 @@ const LoginPage = () => {
           fontWeight={600}
           mb={2}
         >
-          Login
+          Signup
         </Typography>
         <CustomTextField
           id="email"
@@ -108,14 +108,14 @@ const LoginPage = () => {
             boxShadow: "0 3px 5px 2px rgba(33, 203, 243, .2)",
           }}
         >
-          Login
+          Signup
         </Button>
         <Box sx={{ mt: 2, textAlign: "center" }}>
           <Typography variant="body2" component="span" sx={{ mr: 0.5 }}>
-            Create a New Account
+            Already register!
           </Typography>
-          <Link href="/signup" style={{ color: "#18A0FB", fontWeight: 500 }}>
-            Signup
+          <Link href="/login" style={{ color: "#18A0FB", fontWeight: 500 }}>
+            Login
           </Link>
         </Box>
       </Paper>
@@ -123,4 +123,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SignupPage;

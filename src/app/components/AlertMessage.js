@@ -1,11 +1,11 @@
 'use client'
 
-import { useFeedback } from '@/context/FeedbackContext'
+import { useContextData } from '@/context/Context'
 import { Alert, Snackbar } from '@mui/material'
 import React from 'react'
 
 const AlertMessage = () => {
-    const { message, severity, open, closeMessage } = useFeedback()
+    const { message, severity, open, closeMessage } = useContextData()
     return (
         <Snackbar open={open}
             anchorOrigin={{
