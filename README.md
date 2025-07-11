@@ -23,7 +23,7 @@ password - password
 3) Login - http://localhost:3000/login
 4) Signup - http://localhost:3000/signup
 
-# Product Management System
+# Dashboard Management System
 
 ## Overview
 
